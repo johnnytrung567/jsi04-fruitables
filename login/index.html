@@ -21,14 +21,26 @@
       <div class="form login">
         <div class="form-content">
           <header>Login</header>
-          <form action="#">
+          <form action="#" id="login-form">
             <div class="field input-field">
-              <input type="email" placeholder="Email" class="input" />
+              <input
+                type="email"
+                id="email"
+                placeholder="Email"
+                class="input"
+              />
+              <p id="email-error" style="color: red; font-size: small"></p>
             </div>
 
             <div class="field input-field">
-              <input type="password" placeholder="Password" class="password" />
+              <input
+                type="password"
+                id="password"
+                placeholder="Password"
+                class="password"
+              />
               <i class="bx bx-hide eye-icon"></i>
+              <p id="password-error" style="color: red; font-size: small"></p>
             </div>
 
             <div class="form-link">
@@ -58,15 +70,16 @@
         </div>
 
         <div class="media-options">
-          <a href="#" class="field google">
+          <button type="button" id="login-google-btn" class="field google">
             <img src="images/google.png" alt="" class="google-img" />
             <span>Login with Google</span>
-          </a>
+          </button>
         </div>
       </div>
     </section>
 
     <!-- JavaScript -->
     <!-- <script src="js/script.js"></script> -->
+    <script type="module" src="./js/login.js"></script>
   </body>
 </html>
