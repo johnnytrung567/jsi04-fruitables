@@ -4,7 +4,29 @@ import {
   getDocs,
   doc,
   deleteDoc,
+  query,
+  where,
+  addDoc,
+  updateDoc,
+  increment,
 } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+
+const auth = getAuth();
+let userId;
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in, see docs for a list of available properties
+    // https://firebase.google.com/docs/reference/js/auth.user
+    userId = user.uid;
+  } else {
+    // User is signed out
+    return;
+  }
+});
 
 const productList = document.getElementById("product-list");
 
@@ -58,8 +80,7 @@ function renderProduct(product) {
     >
       <p class="text-dark fs-5 fw-bold mb-0">$${product.price} / kg</p>
       <a
-        href="#"
-        class="btn border border-secondary rounded-pill px-3 text-primary"
+        class="add-btn btn border border-secondary rounded-pill px-3 text-primary"
         ><i
           class="fa fa-shopping-bag me-2 text-primary"
         ></i>
@@ -69,4 +90,54 @@ function renderProduct(product) {
   </div>
 </div>
   `;
+
+  const addBtn = document.getElementsByClassName("add-btn")[product.order - 1];
+  addBtn.onclick = function () {
+    addToCart(product);
+  };
+}
+
+async function addToCart(product) {
+  // Kiểm tra trạng thái đăng nhập của người dùng
+  if (!userId) {
+    alert("You need login to Add to cart");
+    window.location.href = "/login";
+  }
+
+  // Kiểm tra sản phẩm đã có trong giỏ hay chưa
+  let existId = null;
+
+  const q = query(collection(db, "cart"), where("userId", "==", userId));
+
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach(async (cartDoc) => {
+    // doc.data() is never undefined for query doc snapshots
+    let data = { ...cartDoc.data() };
+    data.id = cartDoc.id;
+
+    if (data.productId === product.id) {
+      existId = data.id;
+    }
+  });
+
+  if (!existId) {
+    // Chưa có trong giỏ hàng
+    // Thêm mới
+    // Add a new document with a generated id.
+    const docRef = await addDoc(collection(db, "cart"), {
+      userId,
+      productId: product.id,
+      quantity: 1,
+    });
+    console.log("Document written with ID: ", docRef.id);
+  } else {
+    // Đã có trong giỏ
+    const cartRef = doc(db, "cart", existId);
+
+    // Atomically increment the population of the city by 50.
+    await updateDoc(cartRef, {
+      quantity: increment(1),
+    });
+  }
+  alert("Product added to cart");
 }

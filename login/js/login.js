@@ -38,7 +38,12 @@ loginForm.onsubmit = function (event) {
       // Signed in
       const user = userCredential.user;
       alert("Dang nhap thanh cong");
-      window.location.href = "/admin";
+      if (user.uid === "A7NZ98aJdbbxlx9eiaHQqzndiMw1") {
+        // admin
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/";
+      }
     })
     .catch((error) => {
       const errorCode = error.code;
